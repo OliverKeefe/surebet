@@ -23,13 +23,14 @@ public class Main {
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         ChromeOptions options = new ChromeOptions();
         WebDriver driver = new ChromeDriver(options);
+        DataAssembler dataAssembler = new DataAssembler();
 
         PaddyPowerScrapper paddyPowerScrapper = new PaddyPowerScrapper();
 
         try {
             System.out.println("Connecting to the URL...");
             driver.get(targetUrl);
-            Thread.sleep(10000);
+            Thread.sleep(5000);
             String pageSource = driver.getPageSource();
             System.out.println("Connected to target");
 
@@ -47,6 +48,15 @@ public class Main {
                 paddyPowerOdds = paddyPowerScrapper.oddsGet(oddsElements, doc);
                 paddyPowerRunners = paddyPowerScrapper.runnersGet(runnersElements, doc);
 
+                HashMap<String, String> runnersAndOdds = new HashMap<>();
+                int[] maximumRunners = new int[2];
+                maximumRunners[0] = 0;
+                maximumRunners[1] = 9;
+
+                runnersAndOdds = dataAssembler.runnersAssemble(paddyPowerRunners, paddyPowerOdds, maximumRunners);
+                HashMap<String, Object> WDCMarket = new HashMap<>();
+                WDCMarket = (HashMap<String, Object>) dataAssembler.marketAssemble("Formula 1", "Motorsport", "WDC", "Winner - Drivers Championship", "Paddy Power", runnersAndOdds);
+
                 for (String i : paddyPowerOdds) {
                     System.out.println(i);
                 }
@@ -54,6 +64,15 @@ public class Main {
                 for (String i : paddyPowerRunners) {
                     System.out.println(i);
                 }
+
+                for (Map.Entry<String, String> entry : runnersAndOdds.entrySet()) {
+                    System.out.println("Runner: " + entry.getKey() + ", Odds: " + entry.getValue());
+                }
+
+                for (Map.Entry<String, Object> entry : WDCMarket.entrySet()) {
+                    System.out.print(entry.getKey() + entry.getValue());
+                }
+
                 //market = paddyPowerScrapper.marketGet(runnersElements, oddsElements, 20, doc);
                 //for (Map.Entry<String, String> entry : market.entrySet()) {
                 //    System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());

@@ -12,27 +12,71 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class DataScrapper {
+public class DataScrapper {
+    protected ChromeOptions options;
+    protected WebDriver driver;
+
     protected String targetUrl;
+    protected String runnersQuery;
+    protected String oddsQuery;
+    protected String marketsQuery;
+
+    protected Elements runnersElements;
+    protected Elements oddsElements;
+    protected Elements marketElements;
+
+    protected ArrayList<String> runners = new ArrayList<>();
+    protected ArrayList<String> odds = new ArrayList<>();
+    protected ArrayList<String> marketNames = new ArrayList<>();
+    protected Map<String, String> runnersAndOdds = new HashMap<>();
 
     public DataScrapper() {
-
-        String chromeDriverPath = "/home/oliverkeefe/Development/surebet/surebet/drivers/chromedriver"; // Use the full path
-
+        String chromeDriverPath = "/home/oliverkeefe/Development/surebet/surebet/drivers/chromedriver";
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-
-        ChromeOptions options = new ChromeOptions();
-
-        WebDriver driver = new ChromeDriver(options);
-
-        Map<String, Map<String, Map<String, String>>> sportData = new HashMap<>();
+        this.options = new ChromeOptions();
+        this.driver = new ChromeDriver(options);
     }
 
+    protected void connectToPage(String targetUrl) {
+        this.targetUrl = targetUrl;
+        try {
+            System.out.printf("Attempting to connect to %s%n", targetUrl);
+            driver.get(targetUrl);
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to connect to the page", e);
+        }
+    }
 
+    protected Elements getElements(String cssQuery) {
+        try {
+            if (driver == null) {
+                throw new RuntimeException("WebDriver not initialized.");
+            }
+            String pageSource = driver.getPageSource();
+            Document doc = Jsoup.parse(pageSource);
+            Elements elements = doc.select(cssQuery);
 
-    //public abstract void sportGet(Map<String, Map<String, Map<String, String>>> sportData, String sport);
+            if (elements.isEmpty()) {
+                throw new RuntimeException("No elements found for query: " + cssQuery);
+            }
+            return elements;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get elements for query: " + cssQuery, e);
+        }
+    }
 
-    public ArrayList<String> runnersGet(Elements runnersElements, Document doc) {
+    protected ArrayList<String> getMarketNames(Elements marketElements) {
+        ArrayList<String> marketNames = new ArrayList<>();
+
+        for (Element marketElement : marketElements) {
+            marketNames.add(marketElement.text());
+        }
+
+        return marketNames;
+    }
+
+    protected ArrayList<String> getRunners(Elements runnersElements) {
         ArrayList<String> runners = new ArrayList<>();
 
         for (Element runnerElement : runnersElements) {
@@ -42,7 +86,7 @@ public abstract class DataScrapper {
         return runners;
     }
 
-    public ArrayList<String> oddsGet(Elements oddsElements, Document doc) {
+    protected ArrayList<String> getOdds(Elements oddsElements) {
         ArrayList<String> odds = new ArrayList<>();
 
         for (Element oddElement : oddsElements) {
@@ -52,18 +96,23 @@ public abstract class DataScrapper {
         return odds;
     }
 
-    public Map<String, String> marketGet(Elements runnerElements, Elements oddsElements, int maximumRunners, Document doc) {
-        Map<String, String> market = new HashMap<>();
+    protected HashMap<String, String> getMarkets(Elements runnerElements, Elements oddsElements, int maximumRunners) {
+        HashMap<String, String> market = new HashMap<>();
 
-        for (int i = 0; i <= maximumRunners; i++) {
-            String runner = runnerElements.get(i).text();
-            String odds = oddsElements.get(i).text();
-            market.put(runner, odds);
+        for (int i = 0; i < maximumRunners; i++) {
+            System.out.println(runnerElements.get(i).text());
+            System.out.println(oddsElements.get(i).text());
+            market.put(runnerElements.get(i).text(), oddsElements.get(i).text());
         }
 
         return market;
     }
 
+    protected void closeDriver() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
     //public abstract void categoriesGet(Map<String, Map<String, Map<String, String>>> sportData);
 
     //public abstract void marketsGet(Map<String, Map<String, Map<String, String>>> sportData);

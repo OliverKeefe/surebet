@@ -10,14 +10,6 @@ public class DataAssembler {
 
     public DataAssembler() {}
 
-    // First combine runners and odds from DataScrapper class,
-
-    // Then, Assign market name and standard market name (ID all markets within surebet will be assigned)
-
-    // Then, assign sport category in final individual data structure
-
-    // Finally, add to database
-
     // Final structure should look something like this: [Sport: Formula 1, Market: [Standard Name: WDC, SportsBook Name: World Driver Championship, [Runner: Max Verstappen, Odds: 10/1]]]
     protected HashMap<String, String> runnersAssemble (ArrayList<String> runners, ArrayList<String> odds, int[] maximumRunnersInMarket) {
 
@@ -30,34 +22,20 @@ public class DataAssembler {
         return runnersAndOdds;
     }
 
-    public final Map<String, Object> marketAssemble(String sport, String genre, String standardMarketName, String marketName, String sportsBook, HashMap<String, String> runnersAndOdds) {
+    public final HashMap<String, String> marketAssemble(String sport, String genre, String standardMarketName, String marketName, String sportsBook, HashMap<String, String> runnersAndOdds) {
 
-        Map<String, Object> market = new HashMap<>();
+        HashMap<String, String> market = new HashMap<>();
 
         market.put("Sport", sport);
         market.put("Genre", genre);
         market.put("Standard Market Name", standardMarketName);
         market.put("Market Name", marketName);
         market.put("SportsBook", sportsBook);
-        market.put("Market", new HashMap<String, Object>() {{
+        market.put("Market", String.valueOf(new HashMap<String, Object>() {{
             put("Runners", runnersAndOdds);
-        }});
+        }}));
 
         return market;
 
-            //@Override
-            //public String getSQLTypeName() throws SQLException {
-            //    return "";
-            //}
-//
-            //@Override
-            //public Object[] getAttributes() throws SQLException {
-            //    return new Object[0];
-            //}
-//
-            //@Override
-            //public Object[] getAttributes(Map<String, Class<?>> map) throws SQLException {
-            //    return new Object[0];
-            //}
     }
 }

@@ -31,7 +31,7 @@ public class DataScrapper {
     protected Map<String, String> runnersAndOdds = new HashMap<>();
 
     public DataScrapper() {
-        String chromeDriverPath = "/home/oliverkeefe/Development/surebet/surebet/drivers/chromedriver";
+        String chromeDriverPath = "drivers/chromedriver";
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         this.options = new ChromeOptions();
         this.driver = new ChromeDriver(options);
@@ -113,8 +113,4 @@ public class DataScrapper {
             driver.quit();
         }
     }
-    //public abstract void categoriesGet(Map<String, Map<String, Map<String, String>>> sportData);
-
-    //public abstract void marketsGet(Map<String, Map<String, Map<String, String>>> sportData);
-
 }

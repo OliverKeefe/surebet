@@ -14,8 +14,12 @@ import java.util.Map;
 public class PaddyPower extends DataScrapper implements Bookmaker {
 
     DataAssembler dataAssembler = new DataAssembler();
-    HashMap<String, String> WDCMarketLines = new HashMap<>();
-    HashMap<String, String> WDCMarket = new HashMap<>();
+
+    HashMap<String, String> WDCBettingLines = new HashMap<>();
+    HashMap<String, String> WDC = new HashMap<>();
+
+    HashMap<String, String> WDCWithoutTitleLeaderBettingLines = new HashMap<>();
+    HashMap<String, String> WDCWithoutTitleLeader = new HashMap<>();
 
     public PaddyPower() {
         super();
@@ -25,7 +29,7 @@ public class PaddyPower extends DataScrapper implements Bookmaker {
         this.targetUrl = "https://www.paddypower.com/motor-sport/formula-1";
     }
 
-    private void clickAllTheThings() {
+    public void clickAllTheThings() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
@@ -66,41 +70,40 @@ public class PaddyPower extends DataScrapper implements Bookmaker {
     }
 
     @Override
-    public void assignDataToMarkets() {
+    public void getData() {
         connectToPage(targetUrl);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        clickAllTheThings();
 
         try {
-            Thread.sleep(5000);
+            clickAllTheThings();
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         runnersElements = getElements(runnersQuery);
+        System.out.println("Runners found: " + runnersElements.size());
         oddsElements = getElements(oddsQuery);
+        System.out.println("Odds found: " + oddsElements.size());
         marketElements = getElements(marketsQuery);
+        System.out.println("Markets found: " + marketElements.size());
 
         marketNames = getMarketNames(marketElements);
         runners = getRunners(runnersElements);
         odds = getOdds(oddsElements);
 
-       WDCMarketLines = getMarkets(runnersElements, oddsElements, runnersElements.size());
+        WDCBettingLines = dataAssembler.assembleBettingLines(runners, odds, 0, 21);
+        WDC = dataAssembler.assembleMarket("Formula 1", "Motorsport", "WDC", "Winner - Drivers Championship", "Paddy Power", WDCBettingLines);
 
-        //int[] max = new int[2];
-        //max[0] = 0;
-        //max[1] = 10;
-        //WDCMarketLines = dataAssembler.runnersAssemble(runners, odds, max);
-
-        for (Map.Entry<String, String> entry : WDCMarketLines.entrySet()) {
+        for (Map.Entry<String, String> entry : WDCBettingLines.entrySet()) {
             System.out.println("Runner: " + entry.getKey() + ", Odds: " + entry.getValue());
         }
 
-        WDCMarket = dataAssembler.marketAssemble("Formula 1", "Motorsport", "WDC", "Winner - Drivers Championship", "Paddy Power", WDCMarketLines);
+        WDCWithoutTitleLeaderBettingLines = dataAssembler.assembleBettingLines(runners, odds, 22, 31);
+        WDCWithoutTitleLeader = dataAssembler.assembleMarket("Formula 1", "Motorsport", "WDC Without Title Leader", "Betting Without Max Verstappen", "Paddy Power", WDCWithoutTitleLeaderBettingLines);
+
+        for (Map.Entry<String, String> entry : WDCWithoutTitleLeaderBettingLines.entrySet()) {
+            System.out.println("Runner: " + entry.getKey() + ", Odds: " + entry.getValue());
+        }
 
         closeDriver();
     }

@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The DataScrapper class is responsible for scraping data from a target
+ * sports book using Selenium WebDriver and Jsoup for HTML parsing.
+ */
 public class DataScrapper {
     protected ChromeOptions options;
     protected WebDriver driver;
@@ -37,6 +41,11 @@ public class DataScrapper {
         this.driver = new ChromeDriver(options);
     }
 
+    /**
+     * Connects to the target web page using the specified URL.
+     *
+     * @param targetUrl The URL of the target web page.
+     */
     protected void connectToPage(String targetUrl) {
         this.targetUrl = targetUrl;
         try {
@@ -48,6 +57,12 @@ public class DataScrapper {
         }
     }
 
+    /**
+     * Retrieves HTML elements from the web page using the specified CSS query.
+     *
+     * @param cssQuery The CSS query to select elements.
+     * @return The selected elements.
+     */
     protected Elements getElements(String cssQuery) {
         try {
             if (driver == null) {
@@ -66,6 +81,12 @@ public class DataScrapper {
         }
     }
 
+    /**
+     * Extracts market names from the provided HTML elements.
+     *
+     * @param marketElements The elements containing market names.
+     * @return A list of market names.
+     */
     protected ArrayList<String> getMarketNames(Elements marketElements) {
         ArrayList<String> marketNames = new ArrayList<>();
 
@@ -76,6 +97,12 @@ public class DataScrapper {
         return marketNames;
     }
 
+    /**
+     * Extracts runner names from the provided HTML elements.
+     *
+     * @param runnersElements The elements containing runner names.
+     * @return A list of runner names.
+     */
     protected ArrayList<String> getRunners(Elements runnersElements) {
         ArrayList<String> runners = new ArrayList<>();
 
@@ -86,6 +113,12 @@ public class DataScrapper {
         return runners;
     }
 
+    /**
+     * Extracts odds from the provided HTML elements.
+     *
+     * @param oddsElements The elements containing odds.
+     * @return A list of odds.
+     */
     protected ArrayList<String> getOdds(Elements oddsElements) {
         ArrayList<String> odds = new ArrayList<>();
 
@@ -96,6 +129,14 @@ public class DataScrapper {
         return odds;
     }
 
+    /**
+     * Assembles a map of runners and their corresponding odds.
+     *
+     * @param runnerElements   The elements containing runner names.
+     * @param oddsElements     The elements containing odds.
+     * @param maximumRunners   The maximum number of runners to include.
+     * @return A map where keys are runner names and values are odds.
+     */
     protected HashMap<String, String> getMarkets(Elements runnerElements, Elements oddsElements, int maximumRunners) {
         HashMap<String, String> market = new HashMap<>();
 
@@ -108,6 +149,9 @@ public class DataScrapper {
         return market;
     }
 
+    /**
+     * Closes the WebDriver instance.
+     */
     protected void closeDriver() {
         if (driver != null) {
             driver.quit();

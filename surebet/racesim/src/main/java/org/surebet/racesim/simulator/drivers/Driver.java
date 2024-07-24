@@ -1,22 +1,35 @@
 package org.surebet.racesim.simulator.drivers;
 
 public abstract class Driver {
-    private String driversName;
-    private int driversNumber;
-    private String driversTeam;
+    private String name;
+    private int driverNumber;
+    private String team;
+
+    private float age;
+    private int experience;
+    private int raceWins;
+    private int podiums;
 
     public Driver(String name, int driverNumber, String team) {
-        this.driversName = driversName;
-        this.driversNumber = driversNumber;
-        this.driversTeam = driversTeam;
+        this.name = name;
+        this.driverNumber = driverNumber;
+        this.team = team;
     }
 
-}
+    public String getName() {
+        return name;
+    }
 
-public String getDriversTeam() {
-    return driversTeam;
-}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-public void setDriversTeam(String driversTeam) {
-    this.driversTeam = driversTeam;
+    public String getTeam() {
+        return team;
+    }
+
+    public void setTeam(String team) {
+        this.team = team;
+    }
+
 }
